@@ -31,6 +31,7 @@ hs_err_pid*
 
 .idea/
 bin/
+animation/
 *.iml
 input.json
 *.png

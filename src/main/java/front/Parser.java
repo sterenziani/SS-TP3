@@ -1,32 +1,34 @@
 package front;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import java.util.LinkedList;
+import java.util.Scanner;
+import back.Particle;
 
 public class Parser {
-	private final static Integer DEFAULT_SEED = (int) (Math.random() * Integer.MAX_VALUE);
 	
-	@SuppressWarnings("unchecked")
-    public static Input ParseJSON(String filename)
+    @SuppressWarnings("resource")
+	public static Input ParseInputFile(String filename) throws FileNotFoundException
     {
-		Integer seed;
-		
-    	JSONParser parser = new JSONParser();
-		try
-		{
-			Object obj = parser.parse(new FileReader(filename));
-			JSONObject json = (JSONObject) obj;
-			seed = ((Long) json.getOrDefault("seed", DEFAULT_SEED)).intValue();
-			return new Input();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			return null;
-		}
+		FileInputStream file = new FileInputStream(filename);  
+        Scanner scanner = new Scanner(file);
+        int N = scanner.nextInt();
+        double width = scanner.nextDouble();
+        double height = scanner.nextDouble();
+        double gap = scanner.nextDouble();
+        Collection<Particle> particles = new LinkedList<>();
+        for (int i=0; i < N; i++)
+        {
+        	double x = scanner.nextDouble();
+        	double y = scanner.nextDouble();
+        	double vx = scanner.nextDouble();
+        	double vy = scanner.nextDouble();
+        	double mass = scanner.nextDouble();
+        	double radius = scanner.nextDouble();
+        	Particle p = new Particle(i, x, y, vx, vy, mass, radius);    
+        	particles.add(p);
+        }
+		return new Input(width, height, gap, particles);  
     }
 }
