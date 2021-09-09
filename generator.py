@@ -1,4 +1,5 @@
 import random
+import sys
 from math import sqrt
 
 def generate_file(name, N, width, height, gapSize, velocity, mass, radius, padding):
@@ -34,16 +35,22 @@ def generate_file(name, N, width, height, gapSize, velocity, mass, radius, paddi
 		file.write(str(x) +'  ' +str(y) +'  ' +str(vx) +' ' +str(vy) +' ' +str(mass) +' ' +str(radius) +'\n')
 	return
 
-def main():
-	N = 250
+def main(args):
+	N = 100
+	if(len(args) > 1):
+		N = int(args[1])
 	width = 0.24
 	height = 0.09
-	gapSize = 0.04
+	gapSize = 0.01
+	if(len(args) > 2):
+		gapSize = float(args[2])
 	velocity = 0.01
+	if(len(args) > 3):
+		velocity = float(args[3])
 	mass = 1
 	radius = 0.0015
 	padding = 0.002
 	generate_file('input.txt', N, width, height, gapSize, velocity, mass, radius, padding)
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)

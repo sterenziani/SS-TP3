@@ -6,13 +6,20 @@
 java -jar bin/SS-TP3-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
-## FLOW:
+## PARA ANIMAR:
 ```
 python3 generator.py
 ( Ejecutar en Java )
 cd post-processing
 python3 animator.py
 cd ..
+```
+
+## PARA SIMULAR Y GENERAR GRÁFICOS:
+```
+cd post-processing
+./fpEvolutionAuto.sh
+python3 fpCombiner.py <-- Este último en caso de que quieras volver a graficar los datos generados por el script
 ```
 
 ## OVITO:
@@ -48,11 +55,11 @@ x	y	vx	vy	r 	m
 
 ## TODO:
 ```
-* Detallar como considera la colisión entre las partículas y los vértices de las tabiques que separan los recintos
+* Detallar cómo considera la colisión entre las partículas y los vértices de las tabiques que separan los recintos
 * Graficar la evolución de fp y registrar el tiempo en que se llega al equilibrio
-	** Para distintas (al menos 3) configuraciones del sistema
-	** Variando el ancho de la apertura y el número de partículas N
-	** Para cada configuración, simular varias realizaciones y presentar de manera adecuada los resultados
+	** Queda separar los gráficos entre comparación de N y comparación de gapSize
 * Verificar si, en el equilibrio, se cumple la ley de gases ideales PV = T
+	** Implementar el cálculo de P. Tomar una franja de tiempo y medir la presión en ese período para graficar una evolución temporal
 * Realizar el ajuste de un modelo (P.V ~ T) que corresponda a los datos P vs T utilizando el método genérico
+	** Graficar curva de c para mostrar cuál es el que minimiza el error
 ```

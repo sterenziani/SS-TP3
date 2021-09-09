@@ -24,6 +24,30 @@ public class Simulator {
 		return current_time;
 	}
 	
+	public double getTemperature() {
+		double R = 0.0821; // This one is for when pressure is in atm
+		return Math.pow(getVrms(), 2) * getMassSum() / (3*R);
+	}
+	
+	private double getVrms()
+	{
+		double sum = 0;
+		for(Particle p : particles)
+		{
+			double v2 = Math.pow(p.getVx(), 2) + Math.pow(p.getVy(), 2);
+			sum += v2;
+		}
+		return Math.sqrt(sum/particles.size());
+	}
+	
+	private double getMassSum()
+	{
+		double sum = 0;
+		for(Particle p : particles)
+			sum += p.getMass();
+		return sum;
+	}
+	
 	public void nextEvent()
 	{
 		if(events.size() == 0)
