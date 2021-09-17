@@ -67,8 +67,31 @@ public class Particle implements Comparable<Particle>{
         return -1;
     }
     
-    public double timeUntilWallCollisionY(double height)
+    public double timeUntilWallCollisionY(double width, double height, double gap)
     {
+        if(vx > 0 && x < width/2 && y > (height/2 - gap/2) && y < (height/2 + gap/2))
+        {
+            double Xf = width/2;
+            double dt = (Xf - x) / vx;
+            double Yf = y + vy*dt;
+            if( Yf <= (height/2 - gap/2) && (x + vx*dt) >= width/2 ) {
+                return 1;
+            }
+            if( Yf >= (height/2 + gap/2) && (x + vx*dt) >= width/2 ) {
+                return 1;
+            }
+        }
+        if( vx < 0 && x > width/2 && y > (height/2 - gap/2) && y < (height/2 + gap/2) ) {
+            double Xf = width/2;
+            double dt = (Xf - x) / vx;
+            double Yf = y + vy*dt;
+            if( Yf <= (height/2 - gap/2) && (x + vx*dt) <= width/2 ) {
+                return 1;
+            }
+            if( Yf >= (height/2 + gap/2) && (x + vx*dt) <= width/2 ) {
+                return 1;
+            }
+        }
         if(vy > 0)
             return ((height - radius - y) / vy);	// Hit top wall
         if(vy < 0)

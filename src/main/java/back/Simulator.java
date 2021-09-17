@@ -65,7 +65,7 @@ public class Simulator {
 	private void findEventsForParticle(Particle p1)
 	{
 		double tx = p1.timeUntilWallCollisionX(width, height, gapSize);
-		double ty = p1.timeUntilWallCollisionY(height);
+		double ty = p1.timeUntilWallCollisionY(width, height, gapSize);
 		
 		// If hitting a wall, add that event
 		if(tx >= 0)
@@ -96,29 +96,12 @@ public class Simulator {
 		
 		moveParticles(new_time);
 		current_time = current_time + new_time;
-		if( hitsPartitionTip( a, b ) ) {
-			if( a != null ) {
-				a.bounceY();
-			} else {
-				b.bounceY();
-			}
-		} else {
-			if(a == null && b != null)
-				b.bounceX();
-			if(a != null && b == null)
-				a.bounceY();
-			if(a != null && b!= null)
-				a.bounce(b);
-		}
-	}
-
-	private boolean hitsPartitionTip( Particle a, Particle b ) {
-		double delta = 0.0000001;
-		if( a != null ) {
-			return a.getX() == width/2 && ( a.getY() + a.getRadius() <= (height - gapSize)/2 + delta && a.getX() + a.getRadius() >= (height - gapSize)/2 + delta) || (a.getY() + a.getRadius() <= ((height - gapSize)/2 + gapSize + delta) && a.getY() + a.getRadius() >= ((height - gapSize)/2 + gapSize - delta));
-		} else {
-			return b.getX() == width/2 && ( b.getY() + b.getRadius() <= (height - gapSize)/2 + delta && b.getX() + b.getRadius() >= (height - gapSize)/2 + delta) || (b.getY() + b.getRadius() <= ((height - gapSize)/2 + gapSize + delta) && b.getY() + b.getRadius() >= ((height - gapSize)/2 + gapSize - delta));
-		}
+		if(a == null && b != null)
+			b.bounceX();
+		if(a != null && b == null)
+			a.bounceY();
+		if(a != null && b!= null)
+			a.bounce(b);
 	}
 
 	private void moveParticles(double time)
