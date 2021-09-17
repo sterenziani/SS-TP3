@@ -96,12 +96,28 @@ public class Simulator {
 		
 		moveParticles(new_time);
 		current_time = current_time + new_time;
-		if(a == null && b != null)
-			b.bounceX();
-		if(a != null && b == null)
-			a.bounceY();
-		if(a != null && b!= null)
-			a.bounce(b);
+		if( hitsPartitionTip( a, b ) ) {
+			if( a != null ) {
+				a.bounceY();
+			} else {
+				b.bounceY();
+			}
+		} else {
+			if(a == null && b != null)
+				b.bounceX();
+			if(a != null && b == null)
+				a.bounceY();
+			if(a != null && b!= null)
+				a.bounce(b);
+		}
+	}
+
+	private boolean hitsPartitionTip( Particle a, Particle b ) {
+		if( a != null ) {
+			return a.getX() == width/2 && ( a.getY() == (height - gapSize)/2 || a.getY() == ((height - gapSize)/2 + gapSize) );
+		} else {
+			return b.getX() == width/2 && ( b.getY() == (height - gapSize)/2 || b.getY() == ((height - gapSize)/2 + gapSize) );
+		}
 	}
 
 	private void moveParticles(double time)
