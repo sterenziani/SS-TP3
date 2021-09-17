@@ -113,10 +113,11 @@ public class Simulator {
 	}
 
 	private boolean hitsPartitionTip( Particle a, Particle b ) {
+		double delta = 0.0000001;
 		if( a != null ) {
-			return a.getX() == width/2 && ( a.getY() == (height - gapSize)/2 || a.getY() == ((height - gapSize)/2 + gapSize) );
+			return a.getX() == width/2 && ( a.getY() + a.getRadius() <= (height - gapSize)/2 + delta && a.getX() + a.getRadius() >= (height - gapSize)/2 + delta) || (a.getY() + a.getRadius() <= ((height - gapSize)/2 + gapSize + delta) && a.getY() + a.getRadius() >= ((height - gapSize)/2 + gapSize - delta));
 		} else {
-			return b.getX() == width/2 && ( b.getY() == (height - gapSize)/2 || b.getY() == ((height - gapSize)/2 + gapSize) );
+			return b.getX() == width/2 && ( b.getY() + b.getRadius() <= (height - gapSize)/2 + delta && b.getX() + b.getRadius() >= (height - gapSize)/2 + delta) || (b.getY() + b.getRadius() <= ((height - gapSize)/2 + gapSize + delta) && b.getY() + b.getRadius() >= ((height - gapSize)/2 + gapSize - delta));
 		}
 	}
 
