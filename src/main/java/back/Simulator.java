@@ -65,7 +65,7 @@ public class Simulator {
 	private void findEventsForParticle(Particle p1)
 	{
 		double tx = p1.timeUntilWallCollisionX(width, height, gapSize);
-		double ty = p1.timeUntilWallCollisionY(height);
+		double ty = p1.timeUntilWallCollisionY(width, height, gapSize);
 		
 		// If hitting a wall, add that event
 		if(tx >= 0)
@@ -89,11 +89,7 @@ public class Simulator {
 		double new_time = e.getTime();
 		if(a == null && b == null)
 			return;
-		if(a != null)
-			a.addCollision();
-		if(b != null)
-			b.addCollision();
-		
+
 		moveParticles(new_time);
 		current_time = current_time + new_time;
 		if(a == null && b != null)

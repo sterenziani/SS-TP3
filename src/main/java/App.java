@@ -26,12 +26,13 @@ public class App {
 		Output.createWallFile(input);
 		double rightSidePercentage = 0;
 		int stable_timestamps = 0;
+		int timestamps = 0;
 		
 		Simulator simulator = new Simulator(particles, input.getWidth(), input.getHeight(), input.getGapSize());
 		simulator.findEvents();
 		DecimalFormat df = new DecimalFormat("#.#");
     	df.setMaximumFractionDigits(1);
-		while(stable_timestamps < STABILITY_TIMESTAMPS)
+		while(stable_timestamps < STABILITY_TIMESTAMPS && timestamps < 500)
 		{
 			Output.outputToFile(particles, simulator.getTime());
 			simulator.nextEvent();
@@ -40,6 +41,7 @@ public class App {
 				stable_timestamps++;
 			else
 				stable_timestamps = 0;
+			timestamps++;
 		}
 		System.out.println("Finished simulation! t = " +simulator.getTime());
 	}

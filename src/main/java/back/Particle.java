@@ -8,8 +8,6 @@ public class Particle implements Comparable<Particle>{
     private double mass;
     private double vx;
     private double vy;
-    static double trajectory;
-    private int collisionCounter;
 
     public Particle(int id, double x, double y, double vx, double vy, double mass, double radius)
     {
@@ -20,30 +18,21 @@ public class Particle implements Comparable<Particle>{
         this.mass = mass;
         this.vx = vx;
         this.vy = vy;
-        this.collisionCounter = 0;
     }
 
     private boolean passesGap(double width, double height, double gap)
     {
-    	if( (vx > 0 && x > width/2) || (vx < 0 && x < width/2) )
+    	if( (vx >= 0 && x > width/2) || (vx <= 0 && x < width/2) )
     		return true;
-    	// Moving right, could make it
-    	if(vx > 0 && x < width/2 && y > (height/2 - gap/2) && y < (height/2 + gap/2))
-    	{
-    		double Xf = width/2;
-    		double dt = (Xf - x) / vx;
-    		double Yf = y + vy*dt;
-    		return (Yf > (height/2 - gap/2) && Yf < (height/2 + gap/2));
-    	}
-    	// Moving left, could make it
-    	if(vx < 0 && x > width/2 && y > (height/2 - gap/2) && y < (height/2 + gap/2))
-    	{
-    		double Xf = width/2;
-    		double dt = (Xf - x) / vx;
-    		double Yf = y + vy*dt;
-    		return (Yf > (height/2 - gap/2) && Yf < (height/2 + gap/2));
-    	}
-    	return false;
+    	
+    	double Xf;
+    	if(vx > 0)
+    		Xf = width/2 - radius;
+    	else
+    		Xf = width/2 + radius;
+		double dt = (Xf - x) / vx;
+		double Yf = y + vy*dt;
+    	return (Yf-radius > (height/2 - gap/2) && Yf+radius < (height/2 + gap/2));
     }
     
     public double timeUntilWallCollisionX(double width, double height, double gap)
@@ -67,13 +56,38 @@ public class Particle implements Comparable<Particle>{
         return -1;
     }
     
-    public double timeUntilWallCollisionY(double height)
+    public double timeUntilWallCollisionY(double width, double height, double gap)
     {
         if(vy > 0)
-            return ((height - radius - y) / vy);	// Hit top wall
+        {
+        	if(hitsTip(width, height, gap))
+        		return ((height+gap)/2 - radius - y) / vy;	// Hit top tip
+        	else
+        		return (height - radius - y) / vy;			// Hit top wall
+        }
         if(vy < 0)
-            return ((radius - y) / vy);				// Hit bottom wall
+        {
+        	if(hitsTip(width, height, gap))
+        		return ((height-gap)/2 + radius - y) / vy;	// Hit bottom tip
+        	else
+        		return ((radius - y) / vy);					// Hit bottom wall
+        }
         return -1;
+    }
+    
+    private boolean hitsTip(double width, double height, double gap)
+    {
+    	if((vx >= 0 && x > width/2) || (vx <= 0 && x < width/2))
+    		return false;
+    	
+    	double Yf;
+    	if(vy > 0)
+    		Yf = (height+gap)/2 - radius;
+    	else
+    		Yf = (height-gap)/2 + radius;
+		double dt = (Yf - y) / vy;
+		double Xf = x + vx*dt;
+    	return (Xf >= (width/2 - radius) && Xf <= (width/2 + radius));
     }
 
     public double timeUntilCollision(Particle b)
@@ -146,14 +160,6 @@ public class Particle implements Comparable<Particle>{
 
     public double getMass() {
         return mass;
-    }
-
-    public int getCollisionCounter() {
-        return collisionCounter;
-    }
-
-    public void addCollision() {
-    	collisionCounter++;
     }
 
     public void setX(double x){
