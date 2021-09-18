@@ -116,18 +116,30 @@ def main():
         momentPressures.append(moment_pressure)
         momentTemperatures.append(moment_speed**2)
     
+    tempGroups = pd.DataFrame(
+                                { 
+                                    'temperature': momentTemperatures, 
+                                    'pressure': momentPressures 
+                                }
+                            ).groupby(['temperature'])
+    keys = [key for key, _ in tempGroups]
+    
     fig, ax = plt.subplots()
-    tempGroups = pd.DataFrame(momentTemperatures, columns=['temperature']).groupby(['temperature'])
-    ax.errorbar( momentTemperatures, momentPressures, fmt='o' )
+    ax.errorbar(    
+                    x = keys, 
+                    y = tempGroups['pressure'].mean(), 
+                    yerr = tempGroups['pressure'].std(), 
+                    ecolor='lightblue',
+                    fmt = 'o',
+                    ms = 2    
+                )
     ax.set( xlabel = 'Temperature',
             ylabel = 'Pressure' )
     ax.grid()
-
+    fig.savefig('pressureVsTemperature.png')
     plt.show()
 
-
-            
-
+        
 if __name__ == "__main__":
     main()
 
