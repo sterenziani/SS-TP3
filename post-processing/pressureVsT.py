@@ -80,15 +80,14 @@ class Parser:
 
     def getMoments(self):
         moments = []
-        t = 0
         os.chdir("output")
         for filename in self.input_files_particles:
+            t = float(filename.split("=", 1)[1].split(".txt")[0])
             moment = Moment(t)
             df = pd.read_csv(filename, sep='\t', skiprows=2, header=None, names=["x", "y", "vx", "vy", "radius", "mass"])
             for index, row in df.iterrows():
                 moment.addParticle(row.x, row.y, row.vx, row.vy, row.mass, row.radius)
             moments.append(moment) 
-            t = t + 1
         os.chdir("..")
         return moments
 
@@ -105,10 +104,10 @@ def main():
     for index, moment in enumerate(moments):
         moment_pressure = 0
         moment_speed = 0
-        if index != 0:
+        if index != len(moments)-1:
             for indexParticle, particle in enumerate(moment.getParticles()):
                 moment_speed += particle.getSpeed()
-                pForce = particle.getMomentum() - moments[index-1][indexParticle].getMomentum()
+                pForce = moments[index+1][indexParticle].getMomentum() - particle.getMomentum()
                 if particle.hitsUpperWall() or particle.hitsInferiorWall(height):
                     moment_pressure += float(pForce)/float(width)
                 elif particle.hitsLeftWall() or particle.hitsRightWall(width):
