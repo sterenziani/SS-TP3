@@ -100,7 +100,7 @@ def main():
     N, width, height, gap = parser.getGlobalVariables()
     moments = sorted(parser.getMoments(), key=sorter )
     momentPressures = []
-    momentTemperature = []
+    momentTemperatures = []
 
     for index, moment in enumerate(moments):
         moment_pressure = 0
@@ -114,10 +114,11 @@ def main():
                 elif particle.hitsLeftWall() or particle.hitsRightWall(width):
                     moment_pressure += float(pForce)/float(height)
         momentPressures.append(moment_pressure)
-        momentTemperature.append(moment_speed**2)
+        momentTemperatures.append(moment_speed**2)
     
     fig, ax = plt.subplots()
-    ax.errorbar( momentTemperature, momentPressures )
+    tempGroups = pd.DataFrame(momentTemperatures, columns=['temperature']).groupby(['temperature'])
+    ax.errorbar( momentTemperatures, momentPressures, fmt='o' )
     ax.set( xlabel = 'Temperature',
             ylabel = 'Pressure' )
     ax.grid()
