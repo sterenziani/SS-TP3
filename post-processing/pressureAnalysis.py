@@ -1,7 +1,7 @@
 import math
 import os
 import glob
-import re
+import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -94,26 +94,37 @@ class Parser:
 def sorter(moment: Moment):
     return (moment.getT())
 
-def main():
+def main(args):
+    if len(args) > 1:
+        velocity = float(args[1])
+    else:
+        velocity = ""
+
+    if len(args) > 2:
+        simulation = int(args[2])
+    else:
+        simulation = ""
     parser = Parser()
     N, width, height, gap = parser.getGlobalVariables()
     moments = sorted(parser.getMoments(), key=sorter )
     momentPressures = []
     momentTemperatures = []
 
+    deltaT = 1
     for index, moment in enumerate(moments):
-        moment_pressure = 0
-        moment_speed = 0
-        if index != len(moments)-1:
-            for indexParticle, particle in enumerate(moment.getParticles()):
-                moment_speed += particle.getSpeed()
-                pForce = moments[index+1][indexParticle].getMomentum() - particle.getMomentum()
+        if index >= len(moments)-50 and index <= len(moment)-1:
+            moment_pressure = 0
+            moment_speed = 0
+            for particle in moment.getParticles():
+                pForce = 2*particle.getMomentum()
                 if particle.hitsUpperWall() or particle.hitsInferiorWall(height):
-                    moment_pressure += float(pForce)/float(width)
+                    moment_speed += particle.getSpeed()**2
+                    moment_pressure += float(pForce)/(float(width)*deltaT)
                 elif particle.hitsLeftWall() or particle.hitsRightWall(width):
-                    moment_pressure += float(pForce)/float(height)
-        momentPressures.append(moment_pressure)
-        momentTemperatures.append(moment_speed**2)
+                    moment_speed += particle.getSpeed()**2
+                    moment_pressure += float(pForce)/(float(height)*deltaT)
+            momentPressures.append(moment_pressure)
+            momentTemperatures.append(moment_speed)
     
     tempGroups = pd.DataFrame(
                                 { 
@@ -121,24 +132,32 @@ def main():
                                     'pressure': momentPressures 
                                 }
                             ).groupby(['temperature'])
-    keys = [key for key, _ in tempGroups]
+    keys = list(tempGroups.groups.keys())
+    print(keys)
     
     fig, ax = plt.subplots()
     ax.errorbar(    
-                    x = keys, 
-                    y = tempGroups['pressure'].mean(), 
+                    keys, 
+                    tempGroups['pressure'].mean(), 
                     yerr = tempGroups['pressure'].std(), 
                     ecolor='lightblue',
-                    fmt = 'o',
+                    fmt = '-o',
                     ms = 2    
                 )
     ax.set( xlabel = 'Temperature',
             ylabel = 'Pressure' )
     ax.grid()
-    fig.savefig('pressureVsTemperature.png')
-    plt.show()
+
+    outputDir = "data/"
+    outputFilename = outputDir + 'pressure_temperature_v{}_N{}_S{}.png'.format(velocity, int(N), simulation)
+    try:
+        os.mkdir(outputDir)
+    except:
+        pass
+
+    fig.savefig(outputFilename)
 
         
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
 
