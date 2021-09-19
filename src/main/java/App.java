@@ -31,7 +31,8 @@ public class App {
 		simulator.findEvents();
 		DecimalFormat df = new DecimalFormat("#.#");
     	df.setMaximumFractionDigits(1);
-		while(stable_timestamps < STABILITY_TIMESTAMPS && simulator.getTime() < 500)
+    	int timestamps = 0;
+		while(stable_timestamps < STABILITY_TIMESTAMPS && timestamps < 50000)
 		{
 			Output.outputToFile(particles, simulator.getTime());
 			simulator.nextEvent();
@@ -40,6 +41,7 @@ public class App {
 				stable_timestamps++;
 			else
 				stable_timestamps = 0;
+			timestamps++;
 		}
 		System.out.println("Finished simulation! t = " +simulator.getTime());
 	}
