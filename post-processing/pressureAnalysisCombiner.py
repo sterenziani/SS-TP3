@@ -8,8 +8,12 @@ input_files = sorted(glob.glob("../pressures/pressure_temperature_*.txt"))
 
 for filename in input_files:
     df = pd.read_csv(filename, names=['v^2', 't', 'P'], delimiter='\t', header=None)
-    plt.plot(df['t'], df['P'])    
+    plt.plot(df['t'], df['P'], label="v² = " + str(df['v^2'][0]**2))    
 
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Presión (N/m)')
+plt.tight_layout()
+plt.legend()
 plt.savefig(filename.split('.txt')[0]+ '.png')
 plt.clf()
 plt.cla()
@@ -32,6 +36,8 @@ plt.errorbar(
                 fmt = 'o',
                 ms = 4
             )
+plt.xlabel('Velocidad cuadrada (m²/s²)')
+plt.ylabel('Presión (N/m)')
 plt.savefig("../pressures/pressure_equilibrium.png")
 
 plt.cla()
@@ -54,6 +60,8 @@ for c_aprox in C:
         ec += meanP[i]**2 - 2*meanP[i]*V[i]*c_aprox + (V[i]*c_aprox)**2
     Ec.append( ec )
 plt.plot(C, Ec)
+plt.xlabel('c')
+plt.ylabel('E(c)')
 plt.savefig('../pressures/error_c.png')
 
 plt.cla()
@@ -67,4 +75,6 @@ plt.errorbar(
                 fmt = 'o',
                 ms = 4
             )
+plt.xlabel('Velocidad cuadrada (m²/s²)')
+plt.ylabel('Presión (N/m)')
 plt.savefig("../pressures/pressure_equilibrium_with_error.png")
