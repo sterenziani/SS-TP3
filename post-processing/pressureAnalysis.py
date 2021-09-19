@@ -4,6 +4,9 @@ import glob
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
+from csv import writer
+
+from pandas.core.algorithms import mode
 
 class Particle:
     def __init__( self, x, y, vx, vy, mass, radious ):
@@ -76,6 +79,7 @@ class Parser:
         width = self.input_files_init.readline()
         height = self.input_files_init.readline()
         gap = self.input_files_init.readline()
+        self.input_files_init.close()
         return N, width, height, gap
 
     def getMoments(self):
@@ -110,19 +114,25 @@ def main(args):
     momentPressures = []
     momentTemperatures = []
 
-    deltaT = 1
+    deltaT = 0.01
+    previousTime = 0
+    hits = 0
     for index, moment in enumerate(moments):
-        if index >= len(moments)-50 and index <= len(moment)-1:
+        if moment.getT()-previousTime > deltaT and index >= len(moments)-50:
             moment_pressure = 0
             moment_speed = 0
             for particle in moment.getParticles():
-                pForce = 2*particle.getMomentum()
+                pForce = abs(2*particle.getMomentum())
                 if particle.hitsUpperWall() or particle.hitsInferiorWall(height):
-                    moment_speed += particle.getSpeed()**2
+                    hits += 1
+                    moment_speed += 2*abs(particle.getVx())
                     moment_pressure += float(pForce)/(float(width)*deltaT)
+                    previousTime = moment.getT()
                 elif particle.hitsLeftWall() or particle.hitsRightWall(width):
-                    moment_speed += particle.getSpeed()**2
+                    hits += 1
+                    moment_speed += 2*abs(particle.getSpeed())
                     moment_pressure += float(pForce)/(float(height)*deltaT)
+                    previousTime = moment.getT()
             momentPressures.append(moment_pressure)
             momentTemperatures.append(moment_speed)
     
@@ -133,7 +143,6 @@ def main(args):
                                 }
                             ).groupby(['temperature'])
     keys = list(tempGroups.groups.keys())
-    print(keys)
     
     fig, ax = plt.subplots()
     ax.errorbar(    
@@ -149,13 +158,32 @@ def main(args):
     ax.grid()
 
     outputDir = "data/"
-    outputFilename = outputDir + 'pressure_temperature_v{}_N{}_S{}.png'.format(velocity, int(N), simulation)
+    outputFilename1 = outputDir + 'pressure_temperature_v{}_N{}_S{}.png'.format(velocity, int(N), simulation)
     try:
         os.mkdir(outputDir)
     except:
         pass
 
-    fig.savefig(outputFilename)
+    fig.savefig(outputFilename1)
+    
+    outputDir2 = "pressures/"
+    outputFilename2 = outputDir2 + 'pressure_temperature_v{}_N{}.csv'.format(velocity, int(N), simulation)
+    try:
+        os.mkdir(outputDir2)
+    except:
+        pass
+
+    tempGroups = pd.DataFrame(
+                                { 
+                                    'temperature': list(tempGroups.groups.keys()), 
+                                    'pressure': tempGroups['pressure'].mean()
+                                }
+                            )
+    if not os.path.isfile(outputFilename2):
+        tempGroups.to_csv(outputFilename2, header=True)
+    else:
+        tempGroups.to_csv(outputFilename2, mode='a', header=False)
+    print('Finished with processing information')
 
         
 if __name__ == "__main__":
