@@ -7,23 +7,6 @@ import numpy as np
 import glob
 import re
 
-def getTemperature(df, N):
-	R = 0.0821 # This one is for when pressure is in atm
-	return getVrms(df, N)**2 * getMassSum(df) / (3*R)
-
-def getVrms(df, N):
-	sum = 0
-	for index, row in df.iterrows():
-		v2 = row['vx']**2 + row['vy']**2
-		sum += v2
-	return math.sqrt(sum / N)
-
-def getMassSum(df):
-	sum = 0
-	for index, row in df.iterrows():
-		sum += row['mass']
-	return sum
-
 def getRightSidePercentage(df, N, width):
 	rightParticles = 0
 	for index, row in df.iterrows():
@@ -51,10 +34,10 @@ def main():
 	timestamps=[]
 	percentage=[]
 	for filename in input_files:
-		t = 0.1*float(re.search('\d+', filename).group(0))
+		t = 0.05*float(re.search('\d+', filename).group(0))
 		file = open(filename, 'r')
 		N = int(file.readline())
-		df = pd.read_csv(filename, sep='\t', skiprows=2, header=None, names=["x", "y", "vx", "vy", "radius", "mass"])
+		df = pd.read_csv(filename, sep='\t', skiprows=2, header=None, names=["x", "y", "vx", "vy", "radius", "mass", "color"])
 		fp = getRightSidePercentage(df, N, width)
 		timestamps.append(t)
 		percentage.append(fp)
