@@ -1,10 +1,10 @@
 cd ..
 ./build.sh
-for VELOCITY in 2 1.75 1.5 1.25 1 0.75 0.5 0.25
+for VELOCITY in 0.25 2 0.75 1.5 
 do
-	for SIMULATION in {1..10}
+	for SIMULATION in {1..2}
 	do
-		python3 generator.py 100 0.01 $VELOCITY
+		python3 generator.py 100 0.02 $VELOCITY
 		java -jar bin/SS-TP3-1.0-SNAPSHOT-jar-with-dependencies.jar
 		cd post-processing
 		python3 pressureAnalysis.py $VELOCITY $SIMULATION

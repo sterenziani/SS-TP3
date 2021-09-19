@@ -21,16 +21,16 @@ class Particle:
         return math.sqrt(self.vx**2 + self.vy**2)
 
     def hitsUpperWall( self ):
-        return self.y - self.radious == 0
+        return self.y - self.radious <= 0
     
     def hitsInferiorWall( self, height ):
-        return self.y + self.radious == height
+        return self.y + self.radious >= height
     
     def hitsLeftWall( self ):
-        return self.x - self.radious == 0
+        return self.x - self.radious <= 0
 
     def hitsRightWall( self, width ):
-        return self.x + self.radious == width
+        return self.x + self.radious >= width
 
     def getMomentum( self ):
         return self.mass*self.getSpeed()
@@ -75,10 +75,10 @@ class Parser:
         self.input_files_init = open("input.txt")
 
     def getGlobalVariables( self ):
-        N = self.input_files_init.readline()
-        width = self.input_files_init.readline()
-        height = self.input_files_init.readline()
-        gap = self.input_files_init.readline()
+        N = int(self.input_files_init.readline())
+        width = float(self.input_files_init.readline())
+        height = float(self.input_files_init.readline())
+        gap = float(self.input_files_init.readline())
         self.input_files_init.close()
         return N, width, height, gap
 
@@ -111,80 +111,52 @@ def main(args):
     parser = Parser()
     N, width, height, gap = parser.getGlobalVariables()
     moments = sorted(parser.getMoments(), key=sorter )
-    momentPressures = []
-    momentTemperatures = []
+    pressures = []
 
-    deltaT = 0.01
+    deltaT = 0.3
     previousTime = 0
-    hits = 0
+    pressure = 0
     for index, moment in enumerate(moments):
-        if moment.getT()-previousTime > deltaT and index >= len(moments)-50:
-            moment_pressure = 0
-            moment_speed = 0
-            for particle in moment.getParticles():
-                pForce = abs(2*particle.getMomentum())
-                if particle.hitsUpperWall() or particle.hitsInferiorWall(height):
-                    hits += 1
-                    moment_speed += 2*abs(particle.getVx())
-                    moment_pressure += float(pForce)/(float(width)*deltaT)
-                    previousTime = moment.getT()
-                elif particle.hitsLeftWall() or particle.hitsRightWall(width):
-                    hits += 1
-                    moment_speed += 2*abs(particle.getSpeed())
-                    moment_pressure += float(pForce)/(float(height)*deltaT)
-                    previousTime = moment.getT()
-            momentPressures.append(moment_pressure)
-            momentTemperatures.append(moment_speed)
-    
-    tempGroups = pd.DataFrame(
-                                { 
-                                    'temperature': momentTemperatures, 
-                                    'pressure': momentPressures 
-                                }
-                            ).groupby(['temperature'])
-    keys = list(tempGroups.groups.keys())
-    
-    fig, ax = plt.subplots()
-    ax.errorbar(    
-                    keys, 
-                    tempGroups['pressure'].mean(), 
-                    yerr = tempGroups['pressure'].std(), 
-                    ecolor='lightblue',
-                    fmt = '-o',
-                    ms = 2    
-                )
-    ax.set( xlabel = 'Temperature',
-            ylabel = 'Pressure' )
-    ax.grid()
+        if moment.getT()-previousTime > deltaT:
+            pressures.append(pressure)
+            pressure = 0
+            previousTime = moment.getT()
+        for particle in moment.getParticles():
+            if particle.hitsUpperWall() or particle.hitsInferiorWall(height):
+                pressure += float(2*particle.getMass()*abs(particle.getVy()))/(float(2*width + 2*height)*deltaT)
+            elif particle.hitsLeftWall() or particle.hitsRightWall(width):
+                pressure += float(2*particle.getMass()*abs(particle.getVx()))/(float(2*width + 2*height)*deltaT)
 
-    outputDir = "data/"
-    outputFilename1 = outputDir + 'pressure_temperature_v{}_N{}_S{}.png'.format(velocity, int(N), simulation)
+    pressure = 0
+    equilibriumTime = moments[len(moments)-1].getT()-moments[len(moments)-50].getT()
+    for index, moment in enumerate(moments):
+        if index >= len(moments)-50:
+            for particle in moment.getParticles():
+                if particle.hitsUpperWall() or particle.hitsInferiorWall(height):
+                    pressure += float(2*particle.getMass()*abs(particle.getVy()))/(float(2*width + 2*height)*equilibriumTime)
+                elif particle.hitsLeftWall() or particle.hitsRightWall(width):
+                    pressure += float(2*particle.getMass()*abs(particle.getVx()))/(float(2*height + 2*height)*equilibriumTime)
+    
+
+        
+    outputDir = "pressures/"
     try:
         os.mkdir(outputDir)
     except:
         pass
-
-    fig.savefig(outputFilename1)
     
-    outputDir2 = "pressures/"
-    outputFilename2 = outputDir2 + 'pressure_temperature_v{}_N{}.csv'.format(velocity, int(N), simulation)
-    try:
-        os.mkdir(outputDir2)
-    except:
-        pass
+    outputFilename = outputDir + 'pressure_temperature_v{}_N{}.txt'.format(velocity, int(N), simulation)
+    with open(outputFilename, 'w') as f:
+        for index, pressure in enumerate(pressures):
+            f.write(str(velocity**2) + '\t' +str(deltaT*(index+1)) + '\t' + str(pressure) + '\n')
+    f.close()
 
-    tempGroups = pd.DataFrame(
-                                { 
-                                    'temperature': list(tempGroups.groups.keys()), 
-                                    'pressure': tempGroups['pressure'].mean()
-                                }
-                            )
-    if not os.path.isfile(outputFilename2):
-        tempGroups.to_csv(outputFilename2, header=True)
-    else:
-        tempGroups.to_csv(outputFilename2, mode='a', header=False)
+
+    outputFilenamePressureEquilibrium = outputDir + 'pressure_equilibrium_v{}_N{}.txt'.format(velocity, int(N), simulation)    
+    with open(outputFilenamePressureEquilibrium, 'a') as f:
+        f.write( str(velocity**2) + '\t' + str(pressure) + '\n')
+    f.close()
     print('Finished with processing information')
-
         
 if __name__ == "__main__":
     main(sys.argv)
