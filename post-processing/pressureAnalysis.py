@@ -113,7 +113,7 @@ def main(args):
     moments = sorted(parser.getMoments(), key=sorter )
     pressures = []
 
-    deltaT = 0.3
+    deltaT = 0.08
     previousTime = 0
     pressure = 0
     for index, moment in enumerate(moments):
