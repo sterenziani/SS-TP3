@@ -71,26 +71,46 @@ def main():
 		plt.plot(timestamps, [0.5-stablityMargin]*len(timestamps), color='grey', lw='0.25')
 		plt.plot(timestamps, [0.5+stablityMargin]*len(timestamps), color='grey', lw='0.25')
 		plt.ylim(top=1, bottom=0)
-		for sample in samples[str(simulation)]:
-			plt.plot([sample['t']], [sample['finalPercentage']], color='green', marker='.')
+		plt.xlim(left=0, right=mean(durations[simulation]))
+		#for sample in samples[str(simulation)]:
+			#plt.plot([sample['t']], [sample['finalPercentage']], color='green', marker='.')
 		plt.errorbar(timestamps, tsGroups['rightPercentage'].mean(), yerr=tsGroups['rightPercentage'].std(ddof=0), ecolor='lightblue', fmt='-o', ms=0.5)
 		meanGraphs[simulation] = {'x': timestamps, 'y': tsGroups['rightPercentage'].mean()}
-		plt.title(simulation)
 		plt.xlabel("Tiempo (s)")
 		plt.ylabel("Fracción de partículas en recinto derecho")
-		plt.show()
+		#plt.show()
+		plt.savefig("images/" +simulation +".png", dpi = 200)
+		plt.close()
 
+	# Graph for different N values
 	for item in meanGraphs:
 		info = item.split('-')
 		N = int(info[0])
 		gap = float(info[3])
-		plt.plot(meanGraphs[item]['x'], meanGraphs[item]['y'], label="Apertura " +str(gap) +"m")
+		if(gap == 0.025):
+			plt.plot(meanGraphs[item]['x'], meanGraphs[item]['y'], label="N = " +str(N))
 	plt.xlabel("Tiempo (s)")
 	plt.ylabel("Fracción de partículas en recinto derecho")
 	plt.tight_layout()
 	plt.legend()
 	plt.ylim(top=1, bottom=0)
 	plt.show()
+	plt.close()
+
+	# Graph for different gapSize values
+	for item in meanGraphs:
+		info = item.split('-')
+		N = int(info[0])
+		gap = float(info[3])
+		if(N == 100):
+			plt.plot(meanGraphs[item]['x'], meanGraphs[item]['y'], label="Apertura " +str(gap) +"m")
+	plt.xlabel("Tiempo (s)")
+	plt.ylabel("Fracción de partículas en recinto derecho")
+	plt.tight_layout()
+	plt.legend()
+	plt.ylim(top=1, bottom=0)
+	plt.show()
+	plt.close()
 
 if __name__ == "__main__":
     main()
