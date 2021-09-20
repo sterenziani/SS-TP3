@@ -113,7 +113,7 @@ def main(args):
     moments = sorted(parser.getMoments(), key=sorter )
     pressures = []
 
-    deltaT = 0.08
+    deltaT = 0.1
     previousTime = 0
     pressure = 0
     for index, moment in enumerate(moments):
@@ -148,13 +148,13 @@ def main(args):
     outputFilename = outputDir + 'pressure_temperature_v{}_N{}.txt'.format(velocity, int(N), simulation)
     with open(outputFilename, 'w') as f:
         for index, pressure in enumerate(pressures):
-            f.write(str(velocity**2) + '\t' +str(deltaT*(index+1)) + '\t' + str(pressure) + '\n')
+            f.write(str((velocity**2)*int(N)) + '\t' +str(deltaT*(index+1)) + '\t' + str(pressure) + '\n')
     f.close()
 
 
     outputFilenamePressureEquilibrium = outputDir + 'pressure_equilibrium_v{}_N{}.txt'.format(velocity, int(N), simulation)    
     with open(outputFilenamePressureEquilibrium, 'a') as f:
-        f.write( str(velocity**2) + '\t' + str(pressure) + '\n')
+        f.write( str((velocity**2)*int(N)) + '\t' + str(pressure) + '\n')
     f.close()
     print('Finished with processing information')
         

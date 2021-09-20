@@ -8,7 +8,7 @@ input_files = sorted(glob.glob("../pressures/pressure_temperature_*.txt"))
 
 for filename in input_files:
     df = pd.read_csv(filename, names=['v^2', 't', 'P'], delimiter='\t', header=None)
-    plt.plot(df['t'], df['P'], label="v² = " + str(df['v^2'][0]**2))    
+    plt.plot(df['t'], df['P'], label="Vo² = " + '%.2f'%(df['v^2'][0]/100))    
 
 plt.xlabel('Tiempo (s)')
 plt.ylabel('Presión (N/m)')
@@ -25,7 +25,7 @@ meanP = []
 stdP = []
 for filename in input_files:
     df = pd.read_csv(filename, delimiter='\t', names=['v^2', 'P'], header=None)
-    V.append(df['v^2'][0])
+    V.append(df['v^2'][0]/100)
     meanP.append(df['P'].mean())
     stdP.append(df['P'].std())
 plt.errorbar( 
@@ -52,7 +52,12 @@ for i in range(0, len(V)-1):
     A += V[i]**2
 c = B/A
 
-C = np.arange( c - 5, c + 5, 0.1 )
+ec = 0
+for i in range(0, len(V)-1):
+        ec += meanP[i]**2 - 2*meanP[i]*V[i]*c + (V[i]*c)**2
+print(ec)
+
+C = np.arange( c - 20, c + 20, 0.1 )
 Ec = []
 for c_aprox in C:
     ec = 0
@@ -60,6 +65,7 @@ for c_aprox in C:
         ec += meanP[i]**2 - 2*meanP[i]*V[i]*c_aprox + (V[i]*c_aprox)**2
     Ec.append( ec )
 plt.plot(C, Ec)
+plt.ylim((1250,1260))
 plt.xlabel('c')
 plt.ylabel('E(c)')
 plt.savefig('../pressures/error_c.png')
@@ -75,6 +81,6 @@ plt.errorbar(
                 fmt = 'o',
                 ms = 4
             )
-plt.xlabel('Velocidad cuadrada (m²/s²)')
+plt.xlabel('Vo² (m²/s²)')
 plt.ylabel('Presión (N/m)')
 plt.savefig("../pressures/pressure_equilibrium_with_error.png")
