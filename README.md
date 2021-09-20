@@ -52,14 +52,3 @@ x	y	vx	vy	r 	m
 x	y	vx	vy	r 	m
 ......
 ```
-
-## TODO:
-```
-* Detallar cómo considera la colisión entre las partículas y los vértices de las tabiques que separan los recintos
-* Graficar la evolución de fp y registrar el tiempo en que se llega al equilibrio
-	** Queda separar los gráficos entre comparación de N y comparación de gapSize
-* Verificar si, en el equilibrio, se cumple la ley de gases ideales PV = T
-	** Implementar el cálculo de P. Tomar una franja de tiempo y medir la presión en ese período para graficar una evolución temporal
-* Realizar el ajuste de un modelo (P.V ~ T) que corresponda a los datos P vs T utilizando el método genérico
-	** Graficar curva de c para mostrar cuál es el que minimiza el error
-```
